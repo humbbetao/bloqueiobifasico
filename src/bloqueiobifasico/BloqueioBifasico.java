@@ -18,7 +18,10 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author humbe
+ * @author  *
+ * @author Humberto
+ *          Felipe
+ *          Guilherme Alberton
  */
 public class BloqueioBifasico {
 
@@ -30,7 +33,11 @@ public class BloqueioBifasico {
     try {
         PrintWriter writer = new PrintWriter("Arquivo.txt", "UTF-8");
         
+        System.out.println ("Insira o nome do arquivo: ");
         Scanner leitor = new Scanner(System.in);
+        String arq = leitor.next();
+        PrintWriter writer = new PrintWriter(arq, "UTF-8");
+        
         char operações [] = new char[]{'R', 'W'};
         
         System.out.println ("Insira a quantidade de itens de dados:");
