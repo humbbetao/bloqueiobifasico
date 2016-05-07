@@ -33,20 +33,30 @@ public class Escalonador {
         int numeroDeItensDeDados = 0;
         int numeroDeTransacoes = 0;
         int numeroDeAcessos = 0;
+        String[] s;
+        ArrayList<String> dados = new ArrayList<>();
+        
         while ((linha = buffer.readLine()) != null) {
             numeroDeLinhas++;
             System.out.println(linha);
             if (numeroDeLinhas == 1) {
-                linha = linha.replace("Dados: [", "");
-                linha = linha.replace("]", "");
-                
-                String[] s = linha.split(", ");
-                
-
-                numeroDeItensDeDados = s.length;
+                s = linha.split(" ");
+                numeroDeItensDeDados = s.length;;
                 numeroDeTransacoes = Integer.parseInt(s[1]);
                 numeroDeAcessos = Integer.parseInt(s[2]);
+            } else if (numeroDeLinhas == 2) {
+                linha = linha.replace("Dados: [", "");
+                linha = linha.replace("]", "");
+                s = linha.split(", ");
+                for (int i = 0; i < s.length; i++) {
+                    dados.add(s[i]);
+                }
+            } else if (numeroDeLinhas == 3 && numeroDeLinhas < 3 + numeroDeTransacoes) {
+                //transacoes
             } else {
+                //escalonador;
+                
+
             }
         }
     }

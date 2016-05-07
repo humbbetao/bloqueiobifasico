@@ -48,10 +48,13 @@ public class BloqueioBifasico {
                 dados[i] = (char) (65 + (k++));
             }
             System.out.println("Dados: " + Arrays.toString(dados));
-//        writer.write();
-//        writer.write("Dados: "+ Arrays.toString(dados)+"\n");
 
-            System.out.println("Insira a quantidade de Trasações:");
+//            writer.write("Dados: " + Arrays.toString(dados) + "\n");
+//            writer.write(Arrays.toString(dados) + "\n");
+            
+
+            System.out.println("Insira a quantidade de Transações:");
+
             int ntrans = leitor.nextInt();
             List<List<String>> Transações = new ArrayList<>();
 
@@ -62,6 +65,9 @@ public class BloqueioBifasico {
 
             System.out.println("Insira a quantidade de Acessos:");
             int nacess = leitor.nextInt();
+            writer.write(ndados + ", " + ntrans + ", " + nacess + "\n");
+            writer.write("Dados: " + Arrays.toString(dados) + "\n");
+           
 
             Random gerador = new Random();
 
@@ -81,6 +87,7 @@ public class BloqueioBifasico {
                 Transações.get(i).add(end);
 
                 System.out.println("T" + i + ": " + Transações.get(i).toString());
+                writer.write("T" + i + ": " + Transações.get(i).toString() + "\n");
             }
 
             int TotalTransações = (nacess + 2) * ntrans;
@@ -103,9 +110,9 @@ public class BloqueioBifasico {
             }
 
             System.out.println("Schedule: " + Arrays.toString(Schedule));
-            writer.write(ndados + ", " + ntrans + ", " + nacess);
-            writer.write("Dados: " + Arrays.toString(dados) + "\n");
-            writer.write("T" + i + ": " + Transações.get(i).toString() + "\n");
+//            writer.write(ndados + ", " + ntrans + ", " + nacess);
+//            writer.write("Dados: " + Arrays.toString(dados) + "\n");
+//            writer.write("T" + i + ": " + Transações.get(i).toString() + "\n");
             writer.write("Schedule: " + Arrays.toString(Schedule) + "\n");
             writer.close();
 
@@ -115,7 +122,7 @@ public class BloqueioBifasico {
         System.out.println("Digite o nome do Arquivo Para ser Escalonado");
         Escalonador e = new Escalonador();
         String arq = leitor.next();
-        
+
         e.executar(arq);// passa o nome do arquivo que quer escalonar
 
     }
