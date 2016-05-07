@@ -1,6 +1,6 @@
 4, 3, 3
 Dados: [A, B, C, D]
-T0: [S0, R0(C), W0(B), W0(A), E0]
-T1: [S1, R1(D), W1(D), W1(B), E1]
-T2: [S2, R2(C), R2(D), R2(B), E2]
-Schedule: [S0, R0(C), S2, R2(C), S1, W0(B), R1(D), W1(D), R2(D), W1(B), W0(A), E0, E1, R2(B), E2]
+T0: [S0, W0(C), W0(A), W0(C), E0]
+T1: [S1, W1(B), W1(B), R1(D), E1]
+T2: [S2, R2(D), R2(D), R2(C), E2]
+Schedule: [S1, W1(B), W1(B), S0, W0(C), W0(A), R1(D), E1, W0(C), S2, E0, R2(D), R2(D), R2(C), E2]

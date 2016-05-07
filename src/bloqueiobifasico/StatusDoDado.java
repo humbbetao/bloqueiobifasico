@@ -31,4 +31,5 @@ public enum StatusDoDado {
         this.status = status;
     }
 
+
 }
