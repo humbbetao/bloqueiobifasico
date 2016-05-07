@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -19,10 +21,20 @@ import java.util.Queue;
  */
 public class Escalonador {
 
-    Queue<String> filaDeTransacao;
+    PriorityQueue<String> filaDeTransacao;
     ArrayList<String> listaDeTransacao;
+    ArrayList<String> dados;
+    HashMap<String, StatusDoDado> estadoDoDadoCorrente;
+
+    public static final String statusDoDadoDesbloqueado = "U";
+    public static final String statusDoDadoBloqueadoExclusivo = "X";
+    public static final String statusDoDadoBloqueadoCompartilhado = "S";
 
     public Escalonador() {
+        filaDeTransacao = new PriorityQueue<>();
+        listaDeTransacao = new ArrayList<>();
+        dados = new ArrayList<>();
+        estadoDoDadoCorrente = new HashMap<>();
     }
 
     void executar(String arquivotxt) throws FileNotFoundException, IOException {
@@ -34,8 +46,9 @@ public class Escalonador {
         int numeroDeTransacoes = 0;
         int numeroDeAcessos = 0;
         String[] s;
-        ArrayList<String> dados = new ArrayList<>();
-        
+
+        String l;
+        String[] schedule = null;
         while ((linha = buffer.readLine()) != null) {
             numeroDeLinhas++;
             System.out.println(linha);
@@ -55,9 +68,37 @@ public class Escalonador {
                 //transacoes
             } else {
                 //escalonador;
-                
+                l = linha.replace("schedule: [", "");
+                l = l.replace("]", "");
+                schedule = linha.split(", ");
 
             }
         }
+        escalonar(schedule);
     }
+
+    public void solicitacaoDeBloqueio() {
+    }
+
+    public void solicitacaoDeDesbloqueio() {
+    }
+
+    public void solicitacaoDeBloqueioCompartilhado() {
+    }
+
+    public void solicitacaoDeBloqueioExclusivo() {
+    }
+
+    private void escalonar(String[] schedule) {
+        for (String dado : dados) {
+            estadoDoDadoCorrente.put(dado, StatusDoDado.statusDesbloqueado);
+        }
+        for (String i : schedule) {
+            //verifica se comeca uma transacao;
+            if (i.substring(0, 1).equals("S")) {
+                
+            }
+        }
+    }
+
 }
