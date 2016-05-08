@@ -9,17 +9,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author humbe
  */
 public class Escalonador {
+
+    PrintWriter writer;
 
     ArrayList<String> listaDeTransacao;
     ArrayList<String> dados;
@@ -131,12 +139,14 @@ public class Escalonador {
         System.out.println("Bloquando compartilhado " + transacao + " / " + dado);
         switch (estadoDoDadoCorrente.get(dado).getEstado()) {
             case 0:
-                System.out.println("Conseguiu o bloqueio, esta desbloqueado");
+                writer.write("R" + transacao + "(" + dado + ")");
+                System.out.println("Conseguiu o bloqueio, esta desbloqueado" + "\n");
                 listaDeTransacao.add(transacao);
                 estadoDoDadoCorrente.get(dado).setEstado(1);
                 break;
             case 1:
-                System.out.println("Conseguiu o bloqueio, esta compartilhado");
+                writer.write("R" + transacao + "(" + dado + ")");
+                System.out.println("Conseguiu o bloqueio, esta compartilhado" + "\n");
                 listaDeTransacao.add(transacao);
                 break;
             default:
@@ -151,6 +161,7 @@ public class Escalonador {
     public void solicitacaoDeBloqueioExclusivo(String transacao, String dado) {
         System.out.println("Bloqueando Exclusivo " + transacao + " / " + dado);
         if (estadoDoDadoCorrente.get(dado).getEstado() == 0) {
+            writer.write("W" + transacao + "(" + dado + ")" + "\n");
             System.out.println("Conseguiu o bloqueio");
             listaDeTransacao.add(transacao);
             estadoDoDadoCorrente.get(dado).setEstado(2);
@@ -171,6 +182,17 @@ public class Escalonador {
     }
 
     private void escalonar(String[] schedule) {
+        System.out.println("Digite o nome do arquivo de Saida: ");
+        Scanner leitor = new Scanner(System.in);
+        String arq = leitor.next();
+        try {
+            writer = new PrintWriter(arq, "UTF-8");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Escalonador.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Escalonador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        writer.write("Schedule: " + "\n");
         for (String dado : dados) {
 //            StatusDoDado s =  StatusDoDado(0);
             System.out.println(dado + "NOVO");
@@ -179,11 +201,15 @@ public class Escalonador {
         }
         for (String i : schedule) {
             //verifica se comeca uma transacao;
+
             if (i.substring(0, 1).equals("S")) {
                 //comeca transacao
                 System.out.println("Comecou A transacao " + i);
+                writer.write(i + "\n");
             }
             if (i.substring(0, 1).equals("E")) {
+                writer.write(i + "\n");
+                //tem q ver se num tem nada na fila;
                 //termina transacao
 
                 solicitacaoDeDesbloqueio(i.substring(1, 2), "infinito");
@@ -204,6 +230,10 @@ public class Escalonador {
             }
 
         }
+//        while (!filaDeTransacao.isEmpty()) {
+//            despertarFila();
+//        }
+        writer.close();
     }
 
 }
