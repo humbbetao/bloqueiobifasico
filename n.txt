@@ -1,0 +1,6 @@
+4, 3, 3
+Dados: [A, B, C, D]
+T0: [S0, R0(C), W0(D), R0(A), E0]
+T1: [S1, R1(D), R1(B), W1(B), E1]
+T2: [S2, R2(B), W2(D), R2(D), E2]
+Schedule: [S1, R1(D), S2, R2(B), S0, W2(D), R2(D), R0(C), E2, R1(B), W0(D), W1(B), E1, R0(A), E0]

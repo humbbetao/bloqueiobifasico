@@ -16,10 +16,10 @@ public enum StatusDoDado {
 
     private int status;
 
-    private StatusDoDado() {
+    StatusDoDado() {
     }
 
-    private StatusDoDado(int status) {
+    StatusDoDado(int status) {
         this.status = status;
     }
 
@@ -30,6 +30,5 @@ public enum StatusDoDado {
     public void setStatus(int status) {
         this.status = status;
     }
-
 
 }
