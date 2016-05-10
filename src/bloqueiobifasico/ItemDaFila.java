@@ -49,4 +49,9 @@ public class ItemDaFila {
         this.dado = dado;
     }
 
+    @Override
+    public String toString() {
+        return "ItemDaFila{" + "estado=" + estado + ", transacao=" + transacao + ", dado=" + dado + '}';
+    }
+
 }

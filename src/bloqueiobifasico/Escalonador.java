@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -47,6 +48,38 @@ public class Escalonador {
         estadoDoDadoCorrente = new HashMap<>();
     }
 
+    public void despertarFila(String dado) {
+        if (dado.equals("")) {
+            for (int i = 0; i < filaDeTransacao.size(); i++) {
+                ItemDaFila j = filaDeTransacao.get(i);
+                if (j.getEstado() == 1) {
+                    filaDeTransacao.remove(i);
+                    solicitacaoDeBloqueio(statusDoDadoBloqueadoCompartilhado, j.getTransacao(), j.getDado());
+                }
+                if (j.getEstado() == 2) {
+                    filaDeTransacao.remove(i);
+                    solicitacaoDeBloqueio(statusDoDadoBloqueadoExclusivo, j.getTransacao(), j.getDado());
+                }
+            }
+
+        } else {
+            for (ItemDaFila i : filaDeTransacao) {
+                if (i.getDado().equals(dado)) {
+                    System.out.println("Despertando " + dado);
+                    if (i.getEstado() == 1) {
+                        filaDeTransacao.remove(i);
+                        solicitacaoDeBloqueio(statusDoDadoBloqueadoCompartilhado, i.getTransacao(), i.getDado());
+                    }
+                    if (i.getEstado() == 2) {
+                        filaDeTransacao.remove(i);
+                        solicitacaoDeBloqueio(statusDoDadoBloqueadoExclusivo, i.getTransacao(), i.getDado());
+                    }
+                }
+            }
+            //procurar por toda a fila quem esta primeiro e atender o chamado, executa;
+        }
+    }
+
     void executar(String arquivotxt) throws FileNotFoundException, IOException {
         FileReader file = new FileReader(new File(arquivotxt));
         BufferedReader buffer = new BufferedReader(file);
@@ -74,7 +107,6 @@ public class Escalonador {
                 for (int i = 0; i < s.length; i++) {
                     System.out.println(s[i] + "DADO");
                     dados.add(s[i]);
-
                 }
             } else if (numeroDeLinhas == 3 && numeroDeLinhas < 3 + numeroDeTransacoes) {
                 //transacoes
@@ -83,28 +115,19 @@ public class Escalonador {
                 l = linha.replace("schedule: [", "");
                 l = l.replace("]", "");
                 schedule = linha.split(", ");
-//                estadoDoDadoCorrente.put(schedule, new EstadoDoDado("", StatusDoDado.statusDesbloqueado));
-
             }
         }
         escalonar(schedule);
-    }
-
-    public void despertarFila(String dado) {
-        for (ItemDaFila i : filaDeTransacao) {
-            if (i.getDado().equals(dado)) {
-                System.out.println("Despertando " + dado);
-                if (i.getEstado() == 1) {
-                    filaDeTransacao.remove(i);
-                    solicitacaoDeBloqueio(statusDoDadoBloqueadoCompartilhado, i.getTransacao(), i.getDado());
-                }
-                if (i.getEstado() == 2) {
-                    filaDeTransacao.remove(i);
-                    solicitacaoDeBloqueio(statusDoDadoBloqueadoExclusivo, i.getTransacao(), i.getDado());
-                }
+        int verif = 0;
+        while (!filaDeTransacao.isEmpty()) {
+            if (verif < 500) {
+                despertarFila("");
+                verif++;
+            } else {
+                System.out.println("Deadlock Encontrado");
+                break;
             }
         }
-        //procurar por toda a fila quem esta primeiro e atender o chamado, executa;
     }
 
     public void solicitacaoDeDesbloqueio(String transacao, String dado) {
@@ -112,50 +135,51 @@ public class Escalonador {
             System.out.println("Desbloqueando " + transacao + " / " + dado);
             if (estadoDoDadoCorrente.get(dado).getEstado() == 2) {
                 estadoDoDadoCorrente.get(dado).setEstado(0);//desbloqueia
+//                filade.remove(dado);
                 despertarFila(dado);
                 //desperta a fila-wait(dado);
                 estadoDoDadoCorrente.get(dado).setEstado(1);
             } else if (estadoDoDadoCorrente.get(dado).getEstado() == 1) {
-//            listaDeTransacao.add(transacao);
-//                filaDeTransacao.remove();
                 listaDeTransacao.remove(dado);
                 if (listaDeTransacao.isEmpty()) {
                     estadoDoDadoCorrente.get(dado).setEstado(0);
                     //desperta a fila-wait(dado);
                     despertarFila(dado);
                 }
-
             }
-//        } else {
-//            for () {
-//                
-//            }
         }
-
     }
 
     public void solicitacaoDeBloqueioCompartilhado(String transacao, String dado) {
-//        System.out.println(estadoDoDadoCorrente.);
         System.out.println("Bloquando compartilhado " + transacao + " / " + dado);
-        switch (estadoDoDadoCorrente.get(dado).getEstado()) {
-            case 0:
+        if (estadoDoDadoCorrente.get(dado).getEstado() == 0) {
+            if (estadoDoDadoCorrente.get(dado).getTransacao().equals(transacao)) {
                 writer.write("R" + transacao + "(" + dado + ")");
                 System.out.println("Conseguiu o bloqueio, esta desbloqueado" + "\n");
                 listaDeTransacao.add(transacao);
                 estadoDoDadoCorrente.get(dado).setEstado(1);
-                break;
-            case 1:
+            }
+            writer.write("R" + transacao + "(" + dado + ")");
+            System.out.println("Conseguiu o bloqueio, esta desbloqueado" + "\n");
+            listaDeTransacao.add(transacao);
+            estadoDoDadoCorrente.get(dado).setEstado(1);
+
+        } else if (estadoDoDadoCorrente.get(dado).getEstado() == 1) {
+            if (estadoDoDadoCorrente.get(dado).getTransacao().equals(transacao)) {
                 writer.write("R" + transacao + "(" + dado + ")");
                 System.out.println("Conseguiu o bloqueio, esta compartilhado" + "\n");
                 listaDeTransacao.add(transacao);
-                break;
-            default:
-                System.out.println("Nao Conseguiu, entrando pra fila");
-                ItemDaFila novoItemDaFila = new ItemDaFila(1, transacao, dado);
-                filaDeTransacao.add(novoItemDaFila);
-                break;
-        }
+            }
+            writer.write("R" + transacao + "(" + dado + ")");
+            System.out.println("Conseguiu o bloqueio, esta desbloqueado" + "\n");
+            listaDeTransacao.add(transacao);
+            estadoDoDadoCorrente.get(dado).setEstado(1);
+        } else {
+            System.out.println("Nao Conseguiu, entrando pra fila");
+            ItemDaFila novoItemDaFila = new ItemDaFila(1, transacao, dado);
+            filaDeTransacao.add(novoItemDaFila);
 
+        }
     }
 
     public void solicitacaoDeBloqueioExclusivo(String transacao, String dado) {
@@ -165,11 +189,22 @@ public class Escalonador {
             System.out.println("Conseguiu o bloqueio");
             listaDeTransacao.add(transacao);
             estadoDoDadoCorrente.get(dado).setEstado(2);
-        } else {
+        } else if (estadoDoDadoCorrente.get(dado).getEstado() == 2
+                && estadoDoDadoCorrente.get(dado).getTransacao().equals(transacao)) {
+            writer.write("W" + transacao + "(" + dado + ")" + "\n");
+            System.out.println("Conseguiu o bloqueio");
+            listaDeTransacao.add(transacao);
+            estadoDoDadoCorrente.get(dado).setEstado(2);
+        } else if (estadoDoDadoCorrente.get(dado).getEstado() == 1
+                && estadoDoDadoCorrente.get(dado).getTransacao().equals(transacao)) {
             System.out.println("Nao Conseguiu, entrando pra fila");
             ItemDaFila novoItemDaFila = new ItemDaFila(2, transacao, dado);
             filaDeTransacao.add(novoItemDaFila);
 //            filaDeTransacao.add(transacao);
+        } else {
+            System.out.println("Nao Conseguiu, entrando pra fila");
+            ItemDaFila novoItemDaFila = new ItemDaFila(2, transacao, dado);
+            filaDeTransacao.add(novoItemDaFila);
         }
     }
 
@@ -194,7 +229,6 @@ public class Escalonador {
         }
         writer.write("Schedule: " + "\n");
         for (String dado : dados) {
-//            StatusDoDado s =  StatusDoDado(0);
             System.out.println(dado + "NOVO");
             EstadoDoDado item = new EstadoDoDado("", 0);
             estadoDoDadoCorrente.put(dado, item);
@@ -208,11 +242,13 @@ public class Escalonador {
                 writer.write(i + "\n");
             }
             if (i.substring(0, 1).equals("E")) {
+
                 writer.write(i + "\n");
                 //tem q ver se num tem nada na fila;
                 //termina transacao
 
                 solicitacaoDeDesbloqueio(i.substring(1, 2), "infinito");
+                verificarFila(i.substring(1, 2));
                 System.out.println("Commitou " + i);
             }
             if (i.substring(0, 1).equals("R")) {
@@ -236,4 +272,21 @@ public class Escalonador {
         writer.close();
     }
 
+    private void verificarFila(String substring) {
+        ItemDaFila first;
+        System.out.println(Arrays.toString(filaDeTransacao.toArray()));
+        for (int i = 0; i < filaDeTransacao.size(); i++) {
+            first = filaDeTransacao.get(i);
+            if (estadoDoDadoCorrente.get(first.getDado()).getEstado() == 0) {
+                switch (first.getEstado()) {
+                    case 1:
+                        solicitacaoDeBloqueio(statusDoDadoBloqueadoCompartilhado, first.getTransacao(), first.getDado());
+                        break;
+                    case 2:
+                        solicitacaoDeBloqueio(statusDoDadoBloqueadoExclusivo, first.getTransacao(), first.getDado());
+                        break;
+                }
+            }
+        }
+    }
 }
